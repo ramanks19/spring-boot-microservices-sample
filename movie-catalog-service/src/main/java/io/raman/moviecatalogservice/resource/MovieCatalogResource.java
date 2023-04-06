@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import io.raman.moviecatalogservice.models.CatalogItem;
 import io.raman.moviecatalogservice.models.Rating;
+import io.raman.moviecatalogservice.models.UserRating;
 import io.raman.moviecatalogservice.models.Movie;
 
 @RestController
@@ -28,12 +29,9 @@ public class MovieCatalogResource{
     @RequestMapping("/{userId}")
     public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
 
-        List<Rating> ratings = Arrays.asList(
-            new Rating("1234", 4),
-            new Rating("5678", 3)
-        );
+        UserRating ratings = restTemplate.getForObject("http://localhost:8083/ratingsdata/user/" + userId, UserRating.class);
 
-        return ratings.stream().map(rating -> {
+        return ratings.getUserRating().stream().map(rating -> {
             Movie movie = restTemplate.getForObject("http://localhost:8082/movies/" + rating.getMovieId(), Movie.class);
             return new CatalogItem(movie.getName(), "Test", rating.getRating());
         })
