@@ -19,7 +19,7 @@ public class RatingsResource {
         return new Rating(movieId, 4);
     }
 
-    @RequestMapping("/user/{userId}")
+/*    @RequestMapping("/user/{userId}")
     public UserRating getUserRating(@PathVariable("userId") String userId) {
         List<Rating> ratings = Arrays.asList(
             new Rating("1234", 4),
@@ -27,6 +27,16 @@ public class RatingsResource {
         );
         UserRating userRating = new UserRating();
         userRating.setUserRating(ratings);
+        return userRating;
+    }
+*/
+    @RequestMapping("/user/{userId}")
+    public UserRating getUserRating(@PathVariable("userId") String userId) {
+        UserRating userRating = new UserRating();
+        userRating.setUserRating(Arrays.asList(
+            new Rating("550", 5),
+            new Rating("551", 4)
+        ));
         return userRating;
     }
 }
