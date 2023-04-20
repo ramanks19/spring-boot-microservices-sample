@@ -17,6 +17,8 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import io.raman.moviecatalogservice.models.CatalogItem;
 import io.raman.moviecatalogservice.models.Rating;
 import io.raman.moviecatalogservice.models.UserRating;
+import io.raman.moviecatalogservice.services.MovieInfo;
+import io.raman.moviecatalogservice.services.UserRatingInfo;
 import io.raman.moviecatalogservice.models.Movie;
 
 @RestController
@@ -28,6 +30,17 @@ public class MovieCatalogResource{
      */
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private MovieInfo movieInfo;
+
+    @Autowired
+    private UserRatingInfo userRatingInfo;
+
+/*  This approach of having one fallback method for all the services is not ideal as it doesn't provide
+    any information as to for which service the circuit has tripped. So, as a next step we will break the
+    single getCatalog method into two method one for each service to have more granualrity. Thus we can 
+    have one fallback method for each of the method.
 
     @RequestMapping("/{userId}")
     @HystrixCommand(fallbackMethod = "getFallbackCatalog")
@@ -44,6 +57,15 @@ public class MovieCatalogResource{
 
     public List<CatalogItem> getFallbackCatalog(@PathVariable("userId") String userId) {
         return Arrays.asList(new CatalogItem("No movie", "", 0));
+    }
+*/
+    @RequestMapping("/{userId}")
+    public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
+        UserRating userRating = userRatingInfo.getUserRating(userId);
+
+        return userRating.getUserRating().stream()
+                         .map(rating -> movieInfo.getCatalogItem(rating))
+                         .collect(Collectors.toList());
     }
 
 }
